@@ -36,6 +36,7 @@ jobs:
         run: |
           export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME"
           echo "NDK : $ANDROID_NDK_HOME"
+          export YS_BUILD=${{ github.run_number }}
           cargo ndk -t arm64-v8a --platform 26 -o ../android/app/src/main/jniLibs build --release --lib
       - name: Compiler l'APK
         working-directory: natif/android
@@ -63,6 +64,8 @@ jobs:
           key: windows
       - name: Compiler l'exe
         working-directory: natif/rust
+        env:
+          YS_BUILD: ${{ github.run_number }}
         run: cargo build --release --bin yujin-studio
       - name: Préparer
         shell: pwsh
@@ -89,4 +92,4 @@ jobs:
           gh release create "natif-0.1.$N" Yujin-Studio-Natif.apk Yujin-Studio-Natif-Windows.zip \
             --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
             --title "Yujin Studio natif 0.1.$N (test)" \
-            --notes "Version native en Rust (test). Étape 1 : moteur GPU, calques, pinceaux, gestes."
+            --notes "Version native en Rust (test)."
