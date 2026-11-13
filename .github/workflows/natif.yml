@@ -1,0 +1,91 @@
+name: Appli native (Rust)
+
+on:
+  push:
+    branches: [main]
+    paths: ['natif.tgz', '.github/workflows/natif.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extraire
+        run: mkdir natif && tar -xzf natif.tgz -C natif
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Rust pour Android
+        run: |
+          rustup target add aarch64-linux-android
+          cargo install cargo-ndk --locked
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: natif/rust
+          key: android
+      - name: Compiler la bibliothèque native
+        working-directory: natif/rust
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_LATEST_HOME }}
+        run: cargo ndk -t arm64-v8a --platform 26 -o ../android/app/src/main/jniLibs build --release --lib
+      - name: Compiler l'APK
+        working-directory: natif/android
+        env:
+          YS_VC: ${{ github.run_number }}
+          YS_VN: 0.1.${{ github.run_number }}
+          YS_KS_PASS: ${{ secrets.YS_KS_PASS }}
+        run: gradle assembleRelease --no-daemon --stacktrace
+      - run: cp natif/android/app/build/outputs/apk/release/app-release.apk Yujin-Studio-Natif.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: Yujin-Studio-Natif.apk
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extraire
+        shell: bash
+        run: mkdir natif && tar -xzf natif.tgz -C natif
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: natif/rust
+          key: windows
+      - name: Compiler l'exe
+        working-directory: natif/rust
+        run: cargo build --release --bin yujin-studio
+      - name: Préparer
+        shell: pwsh
+        run: |
+          Copy-Item natif/rust/target/release/yujin-studio.exe "Yujin Studio Natif.exe"
+          Compress-Archive -Path "Yujin Studio Natif.exe" -DestinationPath Yujin-Studio-Natif-Windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: Yujin-Studio-Natif-Windows.zip
+
+  publier:
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Publier une préversion
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          N=${{ github.run_number }}
+          gh release create "natif-0.1.$N" Yujin-Studio-Natif.apk Yujin-Studio-Natif-Windows.zip \
+            --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
+            --title "Yujin Studio natif 0.1.$N (test)" \
+            --notes "Version native en Rust (test). Étape 1 : moteur GPU, calques, pinceaux, gestes."
