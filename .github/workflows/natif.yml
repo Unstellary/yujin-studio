@@ -102,6 +102,11 @@ jobs:
         run: |
           wasm-bindgen --target web --no-typescript --out-dir site natif/rust/target/wasm32-unknown-unknown/release/yujin_studio.wasm
           cp natif/rust/web/* site/
+          # dossier des petits scripts renommé à chaque version (sinon Safari garde l'ancien en cache)
+          N=${{ github.run_number }}
+          mv site/snippets "site/snippets-$N"
+          sed -i "s#\./snippets/#./snippets-$N/#g" site/yujin_studio.js
+          grep -o "snippets-$N/[^']*" site/yujin_studio.js | head
           sed -i "s/__BUILD__/${{ github.run_number }}/g" site/index.html
           echo '{"build": ${{ github.run_number }}}' > site/version.json
           ls -la site
