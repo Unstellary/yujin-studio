@@ -1,8 +1,8 @@
-import { ys_download, ys_open } from './snippets-18/yujin_studio-7c2f0b542af7f3a8/inline0.js';
-import { idb_del, idb_put } from './snippets-18/yujin_studio-7c2f0b542af7f3a8/inline1.js';
-import * as import1 from "./snippets-18/yujin_studio-7c2f0b542af7f3a8/inline0.js"
-import * as import2 from "./snippets-18/yujin_studio-7c2f0b542af7f3a8/inline1.js"
-import * as import3 from "./snippets-18/yujin_studio-7c2f0b542af7f3a8/inline1.js"
+import { ys_download, ys_open } from './snippets-19/yujin_studio-7c2f0b542af7f3a8/inline0.js';
+import { idb_del, idb_put } from './snippets-19/yujin_studio-7c2f0b542af7f3a8/inline1.js';
+import * as import1 from "./snippets-19/yujin_studio-7c2f0b542af7f3a8/inline0.js"
+import * as import2 from "./snippets-19/yujin_studio-7c2f0b542af7f3a8/inline1.js"
+import * as import3 from "./snippets-19/yujin_studio-7c2f0b542af7f3a8/inline1.js"
 
 
 /**
@@ -2603,9 +2603,9 @@ function __wbg_get_imports() {
     return {
         __proto__: null,
         "./yujin_studio_bg.js": import0,
-        "./snippets-18/yujin_studio-7c2f0b542af7f3a8/inline0.js": import1,
-        "./snippets-18/yujin_studio-7c2f0b542af7f3a8/inline1.js": import2,
-        "./snippets-18/yujin_studio-7c2f0b542af7f3a8/inline1.js": import3,
+        "./snippets/yujin_studio-7c2f0b542af7f3a8/inline0.js": import1,
+        "./snippets/yujin_studio-7c2f0b542af7f3a8/inline1.js": import2,
+        "./snippets/yujin_studio-7c2f0b542af7f3a8/inline1.js": import3,
     };
 }
 
