@@ -105,7 +105,7 @@ jobs:
           # dossier des petits scripts renommé à chaque version (sinon Safari garde l'ancien en cache)
           N=${{ github.run_number }}
           mv site/snippets "site/snippets-$N"
-          sed -i "s#\./snippets/#./snippets-$N/#g" site/yujin_studio.js
+          sed -i -E "/^import /s#\./snippets/#./snippets-$N/#" site/yujin_studio.js
           grep -o "snippets-$N/[^']*" site/yujin_studio.js | head
           sed -i "s/__BUILD__/${{ github.run_number }}/g" site/index.html
           echo '{"build": ${{ github.run_number }}}' > site/version.json
