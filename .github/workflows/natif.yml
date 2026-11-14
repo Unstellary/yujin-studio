@@ -77,13 +77,58 @@ jobs:
           name: windows
           path: Yujin-Studio-Natif-Windows.zip
 
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extraire
+        run: mkdir natif && tar -xzf natif.tgz -C natif
+      - name: Rust pour le navigateur
+        run: rustup target add wasm32-unknown-unknown
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@0.2.130
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: natif/rust
+          key: web
+      - name: Compiler en WebAssembly
+        working-directory: natif/rust
+        env:
+          YS_BUILD: ${{ github.run_number }}
+          RUSTFLAGS: --cfg getrandom_backend="wasm_js"
+        run: cargo build --release --lib --target wasm32-unknown-unknown
+      - name: Préparer le site
+        run: |
+          wasm-bindgen --target web --no-typescript --out-dir site natif/rust/target/wasm32-unknown-unknown/release/yujin_studio.wasm
+          cp natif/rust/web/* site/
+          sed -i "s/__BUILD__/${{ github.run_number }}/g" site/index.html
+          echo '{"build": ${{ github.run_number }}}' > site/version.json
+          ls -la site
+      - name: Mettre en ligne (GitHub Pages, dossier ipad/)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3; do
+            git fetch origin main && git reset --hard origin/main
+            rm -rf ipad && mkdir ipad && cp -r site/. ipad/
+            git add ipad
+            git commit -m "Version web native ${{ github.run_number }}" || exit 0
+            git push origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
+
   publier:
     needs: [android, windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with:
-          merge-multiple: true
+          name: apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows
       - name: Publier une préversion
         env:
           GH_TOKEN: ${{ github.token }}
