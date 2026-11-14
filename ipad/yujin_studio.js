@@ -916,10 +916,10 @@ function __wbg_get_imports() {
             const ret = arg0.height;
             return ret;
         },
-        __wbg_idb_del_3f1d4d8f0318661f: function(arg0, arg1) {
+        __wbg_idb_del_5faf1736de31756b: function(arg0, arg1) {
             idb_del(getStringFromWasm0(arg0, arg1));
         },
-        __wbg_idb_put_746c70a0fe0d71ca: function(arg0, arg1, arg2, arg3, arg4) {
+        __wbg_idb_put_572213e545964a3f: function(arg0, arg1, arg2, arg3, arg4) {
             idb_put(getStringFromWasm0(arg0, arg1), arg2, getArrayU8FromWasm0(arg3, arg4));
         },
         __wbg_includes_40dae55ee37516e5: function(arg0, arg1, arg2) {

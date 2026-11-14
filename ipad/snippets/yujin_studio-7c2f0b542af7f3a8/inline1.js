@@ -2,14 +2,17 @@
 let dbp = null;
 function db() {
   if (!dbp) dbp = new Promise((ok, ko) => {
-    const r = indexedDB.open('yujin-studio', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('fichiers');
+    const r = indexedDB.open('yujin-studio-natif', 1);
+    r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains('fichiers')) r.result.createObjectStore('fichiers'); };
     r.onsuccess = () => ok(r.result);
     r.onerror = () => ko(r.error);
   });
   return dbp;
 }
 export async function idb_load_all() {
+  try { return await load_all(); } catch (e) { console.error('IndexedDB', e); return []; }
+}
+async function load_all() {
   const d = await db();
   return await new Promise((ok, ko) => {
     const out = [];
