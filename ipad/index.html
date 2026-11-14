@@ -39,8 +39,8 @@
   }
 </script>
 <script type="module">
-  import init from './yujin_studio.js?v=17';
-  init({ module_or_path: './yujin_studio_bg.wasm?v=17' }).catch(e => {
+  import init from './yujin_studio.js?v=18';
+  init({ module_or_path: './yujin_studio_bg.wasm?v=18' }).catch(e => {
     console.error(e);
     const el = document.getElementById('chargement');
     if (el) el.innerHTML = '<p>Oups : ' + String(e).replace(/</g, '&lt;') + '</p>';
